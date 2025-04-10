@@ -8,6 +8,8 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Button
 import android.widget.TextView
 import kotlin.concurrent.timer
@@ -69,6 +71,36 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.main, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.action_start -> {
+                if (timerBinder.paused) {
+                    if (isConnected) timerBinder.start(timerTextView.text.toString().toInt())
+                } else {
+                    if (isConnected) timerBinder.start(100)
+                }
+            }
+            R.id.action_stop -> {
+                if (!timerBinder.paused) {
+                    if (isConnected) {
+                        timerBinder.pause()
+                    }
+                } else {
+                    if (isConnected) {
+                        timerBinder.stop()
+                    }
+                }
+            }
+            else -> return false
+        }
+        return true
     }
 
 
