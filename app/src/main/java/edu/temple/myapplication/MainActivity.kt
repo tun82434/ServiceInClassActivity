@@ -1,6 +1,7 @@
 package edu.temple.myapplication
 
 import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import androidx.appcompat.app.AppCompatActivity
@@ -44,6 +45,11 @@ class MainActivity : AppCompatActivity() {
 
         timerTextView = findViewById(R.id.textView)
         var stopButton = findViewById<Button>(R.id.startButton)
+        val sharedPref = getSharedPreferences("countdown_prefs", Context.MODE_PRIVATE)
+        val wasPaused = sharedPref.getBoolean("is_paused", false)
+        val savedTime = sharedPref.getInt("pausedTime", 100)
+        timerTextView.text = savedTime.toString()
+
 
         bindService(
             Intent(this, TimerService::class.java),
@@ -52,12 +58,7 @@ class MainActivity : AppCompatActivity() {
         )
 
         findViewById<Button>(R.id.startButton).setOnClickListener {
-            if (timerBinder.paused) {
-                if (isConnected) timerBinder.start(timerTextView.text.toString().toInt())
-            } else {
-                if (isConnected) timerBinder.start(100)
-            }
-
+                if (isConnected) timerBinder.start(timerTextView.text.toString().toIntOrNull() ?: 100)
         }
         
         findViewById<Button>(R.id.stopButton).setOnClickListener {

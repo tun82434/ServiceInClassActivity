@@ -1,6 +1,7 @@
 package edu.temple.myapplication
 
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.os.Binder
 import android.os.Handler
@@ -80,6 +81,13 @@ class TimerService : Service() {
             paused = !paused
             isRunning = !paused
         }
+        val time = timerHandler?.obtainMessage()?.what ?: 0
+        val sharedPref = getSharedPreferences("countdown_prefs", Context.MODE_PRIVATE)
+        with (sharedPref.edit()) {
+            putInt("paused_time", time)
+            putBoolean("is_paused", true)
+            apply()
+        }
     }
 
     inner class TimerThread(private val startValue: Int) : Thread() {
@@ -116,7 +124,12 @@ class TimerService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-
+        val sharedPref = getSharedPreferences("countdown_prefs", Context.MODE_PRIVATE)
+        with (sharedPref.edit()) {
+            remove("paused_time")
+            remove("is_paused")
+            apply()
+        }
         Log.d("TimerService status", "Destroyed")
     }
 
